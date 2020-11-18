@@ -1,0 +1,49 @@
+name: Trigger new release
+on:
+  workflow_dispatch:
+    inputs:
+      versionTag:
+        description: "Version tag (e.g., v1.2.3)"
+        default: v0.0.1
+        required: true
+
+jobs:
+  create-release:
+    name: Start release process
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Create release branch
+        run: git checkout -b release/${{ github.event.inputs.versionTag }}
+      - name: Initialize mandatory git config
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email noreply@github.com
+      - name: Update Changelog
+        uses: thomaseizinger/keep-a-changelog-new-release@v1
+        with:
+          version: ${{ github.event.inputs.versionTag }}
+      - name: Commit changelog and manifest files
+        id: make-commit
+        run: |
+          git add CHANGELOG.md
+          git commit --message "Prepare release ${{ github.event.inputs.versionTag }}"
+          echo "::set-output name=commit::$(git rev-parse HEAD)"
+      - name: Push new branch
+        run: git push origin release/${{ github.event.inputs.versionTag }}
+
+      - name: Create pull request into main
+        uses: thomaseizinger/create-pull-request@1.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          head: release/${{ github.event.inputs.versionTag }}
+          base: main
+          title: Merge release ${{ github.event.inputs.versionTag }} into main
+          reviewers: ${{ github.event.issue.user.login }}
+          body: |
+            This PR was created by the [release  workflow](../actions/workflows/release-pr.yml).
+            Update Changelog: ${{ steps.make-commit.outputs.commit }}.
+
+            After merging, the [release creation workflow](../actions/workflows/release-pr-merge.yml) will be started automatically.

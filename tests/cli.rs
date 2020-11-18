@@ -34,7 +34,7 @@ fn run_short_flag() -> Result<(), Box<dyn std::error::Error>> {
         .arg(output_file.path().to_str().unwrap());
     cmd.assert().success();
 
-    output_file.assert(predicate::str::contains("bash"));
+    output_file.assert(predicate::str::contains("sh"));
     output_file.assert(predicate::str::contains("variable"));
     output_file.assert(predicate::str::contains("value"));
 
@@ -59,7 +59,7 @@ fn run_long_flag() -> Result<(), Box<dyn std::error::Error>> {
         .arg(output_file.path().to_str().unwrap());
     cmd.assert().success();
 
-    output_file.assert(predicate::str::contains("bash"));
+    output_file.assert(predicate::str::contains("sh"));
     output_file.assert(predicate::str::contains("variable"));
     output_file.assert(predicate::str::contains("value"));
 
@@ -136,9 +136,9 @@ fn two_yamls() -> Result<(), Box<dyn std::error::Error>> {
     input_file
         .write_str(
             "---\n\
-            first_file: here
+            first_file: 1
             ---\n\
-            second_file: here
+            second_file: 2
             ---\n\
             ",
         )
@@ -153,7 +153,9 @@ fn two_yamls() -> Result<(), Box<dyn std::error::Error>> {
 
     output_file.assert(predicate::path::exists());
     output_file.assert(predicate::str::contains("first_file="));
-    output_file.assert(predicate::str::contains("here"));
+    output_file.assert(predicate::str::contains("1"));
+    output_file.assert(predicate::str::contains("second_file="));
+    output_file.assert(predicate::str::contains("2"));
 
     input_file.close().unwrap();
     output_file.close().unwrap();
@@ -183,15 +185,17 @@ fn filter() -> Result<(), Box<dyn std::error::Error>> {
         .arg("--out")
         .arg(output_file.path().to_str().unwrap())
         .arg("--filter")
-        .arg("var1")
-        .arg("var3");
+        .arg("var1,var3");
     cmd.assert()
         .success()
-        .stderr(predicate::str::contains(" Written key 'var1'"))
-        .stderr(predicate::str::contains(" Written key 'var3'"));
+        .stderr(predicate::str::contains("Input file:"));
+    cmd.assert()
+        .success()
+        .stderr(predicate::str::contains("Written key 'var1'"));
 
     output_file.assert(predicate::path::exists());
     output_file.assert(predicate::str::contains("var1="));
+    output_file.assert(predicate::str::contains("var3="));
     output_file.assert(predicate::str::is_match(r#"var\d="#).unwrap().count(2));
 
     input_file.close().unwrap();

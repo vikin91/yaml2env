@@ -1,0 +1,76 @@
+name: Cross-compile binaries for the release
+on:
+  workflow_dispatch:
+    inputs:
+      versionTag:
+        description: "Version tag (e.g., v1.2.3)"
+        default: v0.0.1
+        required: true
+
+jobs:
+  release-linux:
+    name: Cross Build Linux
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target:
+          - x86_64-unknown-linux-gnu
+          - armv7-unknown-linux-gnueabihf
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: refs/tags/${{ github.event.inputs.versionTag }}
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      - uses: actions-rs/cargo@v1
+        with:
+          use-cross: true
+          command: build
+          args: --release --target ${{ matrix.target }}
+      - uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/${{ matrix.target }}/release/yaml2env
+          asset_name: yaml2env-${{ matrix.target }}
+          tag: ${{ github.event.inputs.versionTag }}
+          overwrite: true
+  release-mac:
+    name: Cross Build Mac
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        target:
+          - x86_64-apple-darwin
+          # - aarch64-apple-darwin # FAILS
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          target: ${{ matrix.target }}
+          override: true
+      - uses: actions-rs/cargo@v1
+        with:
+          use-cross: false
+          command: build
+          args: --release --target ${{ matrix.target }}
+      - uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/${{ matrix.target }}/release/yaml2env
+          asset_name: yaml2env-${{ matrix.target }}
+          tag: ${{ github.event.inputs.versionTag }}
+          overwrite: true
