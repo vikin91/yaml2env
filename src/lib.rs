@@ -96,7 +96,9 @@ mod tests {
         VAR=$(cat << '_EOF'
         "value"
         _EOF
-        )"#};
+        )
+
+        "#};
 
         assert_eq!(expected1, expected2);
 
