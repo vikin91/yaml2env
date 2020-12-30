@@ -1,8 +1,8 @@
 use assert_cmd::prelude::*; // Add methods on commands
 use assert_fs::prelude::*;
-use log::{info, debug};
+use log::{debug, info};
 use predicates::prelude::*; // Used for writing assertions
-use std::{process::Command}; // Run programs
+use std::process::Command; // Run programs
 
 #[test]
 fn test_help() -> Result<(), Box<dyn std::error::Error>> {
@@ -28,13 +28,11 @@ fn run_short_flag() -> Result<(), Box<dyn std::error::Error>> {
     input_file.assert(predicate::str::contains("variable: value"));
     info!("{}", output_file.path().to_str().unwrap());
 
-    cmd
-        .arg("-i")
+    cmd.arg("-i")
         .arg(input_file.path().to_str().unwrap())
         .arg("-o")
         .arg(output_file.path().to_str().unwrap());
-    cmd.assert()
-        .success();
+    cmd.assert().success();
 
     output_file.assert(predicate::str::contains("bash"));
     output_file.assert(predicate::str::contains("variable"));
@@ -55,13 +53,11 @@ fn run_long_flag() -> Result<(), Box<dyn std::error::Error>> {
     input_file.write_str("variable: value").unwrap();
     debug!("{}", output_file.path().to_str().unwrap());
 
-    cmd
-        .arg("--in")
+    cmd.arg("--in")
         .arg(input_file.path().to_str().unwrap())
         .arg("--out")
         .arg(output_file.path().to_str().unwrap());
-    cmd.assert()
-        .success();
+    cmd.assert().success();
 
     output_file.assert(predicate::str::contains("bash"));
     output_file.assert(predicate::str::contains("variable"));
@@ -81,14 +77,13 @@ fn empty_input() -> Result<(), Box<dyn std::error::Error>> {
     input_file.touch().unwrap();
     debug!("{}", output_file.path().to_str().unwrap());
 
-    cmd
-        .arg("--in")
+    cmd.arg("--in")
         .arg(input_file.path().to_str().unwrap())
         .arg("--out")
         .arg(output_file.path().to_str().unwrap());
-    cmd.assert()
-        .failure()
-        .stderr(predicate::str::contains("input file contains no yaml documents"));
+    cmd.assert().failure().stderr(predicate::str::contains(
+        "input file contains no yaml documents",
+    ));
 
     input_file.assert(predicate::str::is_empty());
     output_file.assert(predicate::path::missing());
@@ -105,15 +100,18 @@ fn empty_first_yaml() -> Result<(), Box<dyn std::error::Error>> {
     let input_file = assert_fs::NamedTempFile::new("test.yaml").unwrap();
     let output_file = assert_fs::NamedTempFile::new("test.env").unwrap();
     input_file.touch().unwrap();
-    input_file.write_str("---\n\
-    ---\n\
-    second_file: here
-    ---\n\
-    ").unwrap();
+    input_file
+        .write_str(
+            "---\n\
+            ---\n\
+            second_file: here
+            ---\n\
+            ",
+        )
+        .unwrap();
     debug!("{}", output_file.path().to_str().unwrap());
 
-    cmd
-        .arg("--in")
+    cmd.arg("--in")
         .arg(input_file.path().to_str().unwrap())
         .arg("--out")
         .arg(output_file.path().to_str().unwrap());
@@ -135,22 +133,23 @@ fn two_yamls() -> Result<(), Box<dyn std::error::Error>> {
     let input_file = assert_fs::NamedTempFile::new("test.yaml").unwrap();
     let output_file = assert_fs::NamedTempFile::new("test.env").unwrap();
     input_file.touch().unwrap();
-    input_file.write_str("---\n\
-    first_file: here
-    ---\n\
-    second_file: here
-    ---\n\
-    ").unwrap();
+    input_file
+        .write_str(
+            "---\n\
+            first_file: here
+            ---\n\
+            second_file: here
+            ---\n\
+            ",
+        )
+        .unwrap();
     debug!("{}", output_file.path().to_str().unwrap());
 
-    cmd
-        .arg("--in")
+    cmd.arg("--in")
         .arg(input_file.path().to_str().unwrap())
         .arg("--out")
         .arg(output_file.path().to_str().unwrap());
-    cmd.assert()
-        .success();
-        // .stderr(predicate::str::contains("first yaml document is empty"));
+    cmd.assert().success();
 
     output_file.assert(predicate::path::exists());
     output_file.assert(predicate::str::contains("first_file="));
@@ -168,15 +167,18 @@ fn filter() -> Result<(), Box<dyn std::error::Error>> {
     let input_file = assert_fs::NamedTempFile::new("test.yaml").unwrap();
     let output_file = assert_fs::NamedTempFile::new("test.env").unwrap();
     input_file.touch().unwrap();
-    input_file.write_str("---\n\
-    var1: val1\n\
-    var2: val2\n\
-    var3: val3\n\
-    ").unwrap();
+    input_file
+        .write_str(
+            "---\n\
+            var1: val1\n\
+            var2: val2\n\
+            var3: val3\n\
+    ",
+        )
+        .unwrap();
     debug!("{}", output_file.path().to_str().unwrap());
 
-    cmd
-        .arg("--in")
+    cmd.arg("--in")
         .arg(input_file.path().to_str().unwrap())
         .arg("--out")
         .arg(output_file.path().to_str().unwrap())
@@ -198,8 +200,7 @@ fn filter() -> Result<(), Box<dyn std::error::Error>> {
 fn file_doesnt_exist() -> Result<(), Box<dyn std::error::Error>> {
     let mut cmd = Command::cargo_bin("yaml2env")?;
 
-    cmd
-        .arg("-i")
+    cmd.arg("-i")
         .arg("test/file/doesnt/exist")
         .arg("-o")
         .arg("out.env");
