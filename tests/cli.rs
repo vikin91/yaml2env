@@ -183,10 +183,12 @@ fn filter() -> Result<(), Box<dyn std::error::Error>> {
         .arg("--out")
         .arg(output_file.path().to_str().unwrap())
         .arg("--filter")
-        .arg("var1,var3");
+        .arg("var1")
+        .arg("var3");
     cmd.assert()
         .success()
-        .stderr(predicate::str::contains(" Written key 'var1'"));
+        .stderr(predicate::str::contains(" Written key 'var1'"))
+        .stderr(predicate::str::contains(" Written key 'var3'"));
 
     output_file.assert(predicate::path::exists());
     output_file.assert(predicate::str::contains("var1="));

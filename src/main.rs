@@ -1,3 +1,4 @@
+#![warn(clippy::all)]
 #[macro_use]
 extern crate log;
 
@@ -58,7 +59,11 @@ fn main() -> Result<()> {
             std::process::exit(1);
         }
     };
-    let result = convert(input_str)?;
+
+    let result = match flags.values_of("filter") {
+        Some(list) => convert(input_str, list.collect())?,
+        None => convert(input_str, Vec::<&str>::new())?,
+    };
 
     let out_file = flags.value_of_os("out-file").unwrap(); // safe to unwrap because default is provided
     debug!("Output file: {:?}", out_file.to_str().unwrap());
