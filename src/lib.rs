@@ -31,16 +31,17 @@ pub fn convert(yaml_str: String, filter: Vec<&str>) -> Result<String> {
 
     for (k, v) in hash.into_iter() {
         if let Some(key) = k.into_string() {
-            if filter.len() > 0 && !filter.contains(&key.as_str()) {
-                continue;
-            }
-            if let Some(value) = v.into_string() {
-                debug!("Written key '{}'", key);
-                buf.write_fmt(format_args!(
-                    "{name}=$(cat << '_EOF'\n{value:?}\n_EOF\n)\n\n",
-                    name = key,
-                    value = value
-                ))?;
+            if filter.is_empty() || filter.contains(&key.as_str()) {
+                if let Some(value) = v.into_string() {
+                    debug!("Written key '{}'", key);
+                    buf.write_fmt(format_args!(
+                        "{name}=$(cat << '_EOF'\n{value:?}\n_EOF\n)\n\n",
+                        name = key,
+                        value = value
+                    ))?;
+                }
+            } else {
+                debug!("Skipping key '{}'", key);
             }
         }
     }
