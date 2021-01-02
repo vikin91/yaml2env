@@ -79,6 +79,6 @@ fn build_filter(values: Option<clap::Values>) -> Vec<String> {
             .into_iter()
             .map(|s| s.to_string())
             .collect::<Vec<String>>(),
-        None => return Vec::<String>::new(),
+        None => Vec::<String>::new(),
     }
 }
