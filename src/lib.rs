@@ -10,8 +10,7 @@ use yaml_rust::YamlLoader;
 
 pub type Result<T> = std::result::Result<T, Box<dyn Error>>;
 
-// TODO: do not enforce Vec but use iterable type
-pub fn convert(yaml_str: String, filter: Vec<&str>) -> Result<String> {
+pub fn convert(yaml_str: String, filter: &[String]) -> Result<String> {
     let out = match YamlLoader::load_from_str(yaml_str.as_str()) {
         Ok(yaml) => yaml,
         Err(e) => bail!("unable to parse input as yaml: {}", e),
@@ -31,7 +30,7 @@ pub fn convert(yaml_str: String, filter: Vec<&str>) -> Result<String> {
 
     for (k, v) in hash.into_iter() {
         if let Some(key) = k.into_string() {
-            if filter.is_empty() || filter.contains(&key.as_str()) {
+            if filter.is_empty() || filter.contains(&key) {
                 if let Some(value) = v.into_string() {
                     debug!("Written key '{}'", key);
                     buf.write_fmt(format_args!(
@@ -55,7 +54,7 @@ mod tests {
 
     // t_convert wraps `convert` to return error as string
     fn t_convert(yaml_str: &str) -> Result<String, String> {
-        match super::convert(yaml_str.to_string(), Vec::<&str>::new()) {
+        match super::convert(yaml_str.to_string(), Vec::<String>::new().as_slice()) {
             Ok(k) => Ok(k),
             Err(e) => Err(e.to_string()),
         }

@@ -59,18 +59,26 @@ fn main() -> Result<()> {
             std::process::exit(1);
         }
     };
-
-    let result = match flags.values_of("filter") {
-        Some(list) => convert(input_str, list.collect())?,
-        None => convert(input_str, Vec::<&str>::new())?,
-    };
-
+    let filter_param = build_filter(flags.values_of("filter"));
     let out_file = flags.value_of_os("out-file").unwrap(); // safe to unwrap because default is provided
     debug!("Output file: {:?}", out_file.to_str().unwrap());
+    write_result(convert(input_str, filter_param.as_slice())?, out_file)
+}
 
-    let out_f = File::create(out_file).unwrap();
+fn write_result(s: String, dest: &OsStr) -> Result<()> {
+    let out_f = File::create(dest).unwrap();
     let mut buf = BufWriter::new(out_f);
-    buf.write_all(result.as_bytes())?;
+    buf.write_all(s.as_bytes())?;
     buf.flush()?;
     Ok(())
+}
+
+fn build_filter(values: Option<clap::Values>) -> Vec<String> {
+    match values {
+        Some(l) => l
+            .into_iter()
+            .map(|s| s.to_string())
+            .collect::<Vec<String>>(),
+        None => return Vec::<String>::new(),
+    }
 }
