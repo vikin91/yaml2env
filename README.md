@@ -87,6 +87,19 @@ Users are advised to download one of these archives.
 
 [See releases](releases)
 
+```sh
+VERSION="v0.1.0"
+ARCH="x86_64-apple-darwin"
+
+# Download
+curl -OSsL "https://github.com/vikin91/yaml2env-tmp/releases/download/${VERSION}/yaml2env-${ARCH}"
+curl -OSsL "https://github.com/vikin91/yaml2env-tmp/releases/download/${VERSION}/yaml2env-${ARCH}.sha256.txt"
+mv "yaml2env-${ARCH}" yaml2env
+
+# Verify and Install
+shasum -c "yaml2env-${ARCH}.sha256.txt" && mv yaml2env $HOME/bin/yaml2env
+```
+
 ## Building
 
 yaml2env is written in Rust so you'll need to grab a Rust installation in order to compile it. yaml2env compiles with Rust 1.28.0 (stable) or newer. In general, yaml2env tracks the latest stable release of the Rust compiler.

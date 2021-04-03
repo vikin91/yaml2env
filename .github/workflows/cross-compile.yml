@@ -45,11 +45,11 @@ jobs:
       - name: Calculate checksums macos
         if: matrix.os == 'macos-latest'
         run: |
-          shasum -a 256 target/${{ matrix.target }}/release/yaml2env | sed 's, .*/, ,' > target/${{ matrix.target }}/release/yaml2env.sha256.txt
+          shasum -a 256 target/${{ matrix.target }}/release/yaml2env | sed 's, .*/,  ,' > target/${{ matrix.target }}/release/yaml2env.sha256.txt
       - name: Calculate checksums ubuntu
         if: matrix.os == 'ubuntu-latest'
         run: |
-          sha256sum target/${{ matrix.target }}/release/yaml2env | sed 's, .*/, ,' > target/${{ matrix.target }}/release/yaml2env.sha256.txt
+          sha256sum target/${{ matrix.target }}/release/yaml2env | sed 's, .*/,  ,' > target/${{ matrix.target }}/release/yaml2env.sha256.txt
       - name: Upload binary
         uses: svenstaro/upload-release-action@v2
         with:
