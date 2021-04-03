@@ -85,15 +85,16 @@ Users are advised to download one of these archives.
 
 ### Downloading released binaries
 
-[See releases](releases)
+- [Latest release](https://github.com/vikin91/yaml2env/releases/latest)
+- [All releases](https://github.com/vikin91/yaml2env/releases)
 
 ```sh
 VERSION="v0.1.0"
 ARCH="x86_64-apple-darwin"
 
 # Download
-curl -OSsL "https://github.com/vikin91/yaml2env-tmp/releases/download/${VERSION}/yaml2env-${ARCH}"
-curl -OSsL "https://github.com/vikin91/yaml2env-tmp/releases/download/${VERSION}/yaml2env-${ARCH}.sha256.txt"
+curl -OSsL "https://github.com/vikin91/yaml2env/releases/download/${VERSION}/yaml2env-${ARCH}"
+curl -OSsL "https://github.com/vikin91/yaml2env/releases/download/${VERSION}/yaml2env-${ARCH}.sha256.txt"
 mv "yaml2env-${ARCH}" yaml2env
 
 # Verify and Install
