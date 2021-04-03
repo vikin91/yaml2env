@@ -3,7 +3,7 @@
 ![CI](https://github.com/vikin91/yaml2env/workflows/CI/badge.svg)
 
 Simple tool to convert flat yaml file into an env file with shell variables, so that the env file may be sourced from a shell script.
-Can be used when secrets from Hashicorp Vault (e.g., fetched using `vault read --format=yaml secret/path`) must be provided to a bash script.
+Can be used when secrets from HashiCorp Vault (e.g., fetched using `vault read --format=yaml secret/path`) must be provided to a bash script.
 This is the author's Rust learning project :crab:
 
 ## Example
@@ -80,7 +80,7 @@ ssh \
 
 The binary name for yaml2env is `yaml2env`.
 
-Archives of precompiled binaries for yaml2env are available for macOS and Linux.
+Archives of pre-compiled binaries for yaml2env are available for macOS and Linux.
 Users are advised to download one of these archives.
 
 ### Downloading released binaries
