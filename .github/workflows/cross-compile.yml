@@ -9,14 +9,23 @@ on:
         required: true
 
 jobs:
-  release-linux:
-    name: Cross Build Linux
-    runs-on: ubuntu-latest
+  release:
+    name: Cross Build
+    runs-on: "${{ matrix.os }}"
     strategy:
       matrix:
-        target:
-          - x86_64-unknown-linux-gnu
-          - armv7-unknown-linux-gnueabihf
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            use-cross: true
+          - os: ubuntu-latest
+            target: armv7-unknown-linux-gnueabihf
+            use-cross: true
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            use-cross: false
+          # - os: macos-latest
+          #   target: aarch64-apple-darwin
     steps:
       - uses: actions/checkout@v2
         with:
@@ -30,48 +39,24 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
       - uses: actions-rs/cargo@v1
         with:
-          use-cross: true
+          use-cross: ${{ matrix.cross }}
           command: build
           args: --release --target ${{ matrix.target }}
-      - uses: svenstaro/upload-release-action@v2
+      - name: Calculate checksums
+        run: |
+          sha256sum target/${{ matrix.target }}/release/yaml2env | sed 's, .*/, ,' > target/${{ matrix.target }}/release/yaml2env.sha256sum
+      - name: Upload binary
+        uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/${{ matrix.target }}/release/yaml2env
           asset_name: yaml2env-${{ matrix.target }}
           tag: ${{ github.event.inputs.versionTag }}
-          overwrite: true
-  release-mac:
-    name: Cross Build Mac
-    runs-on: macos-latest
-    strategy:
-      matrix:
-        target:
-          - x86_64-apple-darwin
-          # - aarch64-apple-darwin # FAILS
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/cache@v2
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-      - uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-          target: ${{ matrix.target }}
-          override: true
-      - uses: actions-rs/cargo@v1
-        with:
-          use-cross: false
-          command: build
-          args: --release --target ${{ matrix.target }}
-      - uses: svenstaro/upload-release-action@v2
+      - name: Upload sha256sum
+        uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/${{ matrix.target }}/release/yaml2env
-          asset_name: yaml2env-${{ matrix.target }}
+          file: target/${{ matrix.target }}/release/yaml2env.sha256sum
+          asset_name: yaml2env-${{ matrix.target }}.sha256sum
           tag: ${{ github.event.inputs.versionTag }}
           overwrite: true
