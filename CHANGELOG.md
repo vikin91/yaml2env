@@ -13,4 +13,3 @@ First release of the tool
 
 [Unreleased]: https://github.com/vikin91/yaml2env/compare/v0.1.0...HEAD
 [v0.1.0]: https://github.com/vikin91/yaml2env/compare/91269ae50fc62d36ee50f666843ecabc2c9145b4...v0.1.0
-
