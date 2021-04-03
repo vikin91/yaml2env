@@ -1,0 +1,68 @@
+name: Manually Cross Compile
+
+on:
+  workflow_dispatch:
+    inputs:
+      versionTag:
+        description: "Version tag (e.g., v1.2.3)"
+        default: v0.0.1
+        required: true
+
+jobs:
+  cross-compile:
+    name: Manually Cross Compile
+    runs-on: "${{ matrix.os }}"
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            use_cross: true
+          - os: ubuntu-latest
+            target: armv7-unknown-linux-gnueabihf
+            use_cross: true
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            use_cross: false
+          # - os: macos-latest
+          #   target: aarch64-apple-darwin
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: refs/tags/${{ github.event.inputs.versionTag }}
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      - uses: actions-rs/cargo@v1
+        with:
+          use-cross: ${{ matrix.use_cross }}
+          command: build
+          args: --release --target ${{ matrix.target }}
+      - name: Calculate checksums macos
+        if: matrix.os == 'macos-latest'
+        run: |
+          shasum -a 256 target/${{ matrix.target }}/release/yaml2env | sed 's, .*/,  ,' > target/${{ matrix.target }}/release/yaml2env.sha256.txt
+      - name: Calculate checksums ubuntu
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sha256sum target/${{ matrix.target }}/release/yaml2env | sed 's, .*/,  ,' > target/${{ matrix.target }}/release/yaml2env.sha256.txt
+      - name: Upload binary
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/${{ matrix.target }}/release/yaml2env
+          asset_name: yaml2env-${{ matrix.target }}
+          tag: ${{ github.event.inputs.versionTag }}
+          overwrite: true
+      - name: Upload sha256sum
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/${{ matrix.target }}/release/yaml2env.sha256.txt
+          asset_name: yaml2env-${{ matrix.target }}.sha256.txt
+          tag: ${{ github.event.inputs.versionTag }}
+          overwrite: true

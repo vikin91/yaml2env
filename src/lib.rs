@@ -26,15 +26,16 @@ pub fn convert(yaml_str: String, filter: &[String]) -> Result<String> {
     };
 
     let mut buf = Vec::new();
-    buf.write_all(b"#!/bin/bash\n\n")?;
+    buf.write_all(b"#!/usr/bin/env sh\n\n")?;
 
     for (k, v) in hash.into_iter() {
         if let Some(key) = k.into_string() {
             if filter.is_empty() || filter.contains(&key) {
                 if let Some(value) = v.into_string() {
                     debug!("Written key '{}'", key);
+                    // Using `{value:?}` would surround the contents with double-quotes
                     buf.write_fmt(format_args!(
-                        "{name}=$(cat << '_EOF'\n{value:?}\n_EOF\n)\n\n",
+                        "{name}=$(cat << '_EOF'\n{value}\n_EOF\n)\n\n",
                         name = key,
                         value = value
                     ))?;
@@ -63,7 +64,7 @@ mod tests {
     #[test]
     fn convert_test1() {
         let expected = format!(
-            "#!/bin/bash\n\n{name}=$(cat << '_EOF'\n{value:?}\n_EOF\n)\n\n",
+            "#!/usr/bin/env sh\n\n{name}=$(cat << '_EOF'\n{value}\n_EOF\n)\n\n",
             name = "VAR",
             value = "value"
         );
@@ -78,7 +79,7 @@ mod tests {
     fn convert_test2() -> Result<(), String> {
         let result = t_convert("VAR: value")?;
 
-        assert!(result.contains("#!/bin/bash"));
+        assert!(result.contains("#!/usr/bin/env sh"));
         assert!(result.contains("VAR"));
         assert!(result.contains("VAR="));
         assert!(result.contains("value"));
@@ -89,13 +90,13 @@ mod tests {
     fn convert_test3() -> Result<(), String> {
         let got = t_convert("VAR: value")?;
         let expected1 = format!(
-            "{name}=$(cat << '_EOF'\n{value:?}\n_EOF\n)\n\n",
+            "{name}=$(cat << '_EOF'\n{value}\n_EOF\n)\n\n",
             name = "VAR",
             value = "value"
         );
         let expected2 = indoc::indoc! {r#"
         VAR=$(cat << '_EOF'
-        "value"
+        value
         _EOF
         )
 
