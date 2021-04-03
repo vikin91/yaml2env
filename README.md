@@ -3,8 +3,8 @@
 ![CI](https://github.com/vikin91/yaml2env/workflows/CI/badge.svg)
 
 Simple tool to convert flat yaml file into an env file with shell variables, so that the env file may be sourced from a shell script.
-
-`yaml2env` allows to convert selected variables into a form that is immediately usable from a shell script when provided with variables in yaml format (e.g., extracted from Hashicorp Vault using `vault read --format=yaml secret/path`).
+Can be used when secrets from Hashicorp Vault (e.g., fetched using `vault read --format=yaml secret/path`) must be provided to a bash script.
+This is the author's Rust learning project :crab:
 
 ## Example
 
