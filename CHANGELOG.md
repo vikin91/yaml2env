@@ -7,19 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
+First release of the tool
 
-### Fixed
-
-### Changed
-
-### Removed
-
-## [v0.1.0-beta4] - 2021-04-03
-
-### Added
-
-- First release of the tool
-
-[unreleased]: https://github.com/vikin91/releases/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/vikin91/releases/tag/v0.1.0
+[unreleased]: https://github.com/vikin91/yaml2env/releases/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/vikin91/yaml2env/releases/tag/v0.1.0
