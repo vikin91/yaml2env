@@ -1,4 +1,5 @@
 name: Cross-compile binaries for the release
+
 on:
   workflow_dispatch:
     inputs:

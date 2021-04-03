@@ -1,4 +1,5 @@
 name: Trigger new release
+
 on:
   workflow_dispatch:
     inputs:

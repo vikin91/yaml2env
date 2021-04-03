@@ -2,11 +2,13 @@
 
 ![CI](https://github.com/vikin91/yaml2env/workflows/CI/badge.svg)
 
-Simple tool to convert flat yaml-file into env-file with Bash variables, so that the env-file may be sourced from a shell script.
+Simple tool to convert flat yaml file into an env file with shell variables, so that the env file may be sourced from a shell script.
 
-Having variables in yaml format (e.g., extracted from Hashicorp Vault using `vault read --format=yaml secret/path`), `yaml2env` allows to convert selected variables into a form that is immediately usable from a shell script. Example:
+`yaml2env` allows to convert selected variables into a form that is immediately usable from a shell script when provided with variables in yaml format (e.g., extracted from Hashicorp Vault using `vault read --format=yaml secret/path`).
 
-`secret.yaml`:
+## Example
+
+Example input (`secret.yaml`):
 
 ```yaml
 USERNAME: admin
@@ -19,13 +21,46 @@ PRIV_KEY: |
   -----END OPENSSH PRIVATE KEY-----
 ```
 
-`script.sh`
+Command:
+
+```sh
+yaml2env --in secret.yaml --out secret.env
+```
+
+Example output (`secret.env`):
+
+```sh
+#!/usr/bin/env sh
+
+USERNAME=$(cat << '_EOF'
+admin
+_EOF
+)
+
+PRIV_KEY=$(cat << '_EOF'
+-----BEGIN OPENSSH PRIVATE KEY-----
+b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAABFwAAAAdzc2gtcn
+NhAAAAAwEAAQAAAQEAycLCAvztPnFJEWevT49dHAEK2WphtCOpfVdodT+FnW1YOCf2bUsH
+MThWTeUYgrRdL3QlkTJW7MFQ+0VqaEI1TveVzkJzPPdhi/dISdRhE6yIxcdVTtNUqPo70l
+...
+-----END OPENSSH PRIVATE KEY-----
+
+_EOF
+)
+
+```
+
+Example application scenario:
 
 ```bash
 #!/usr/bin/env sh -e
 
+IN="${1:-secret.yaml}"
+# or
+# vault read --format=yaml secret/path > secret.yaml
+
 # Create shell-readable env-file
-yaml2env --in secret.yaml --out secret.env --filter=PRIV_KEY,USERNAME
+yaml2env --in "$IN" --out secret.env --filter=PRIV_KEY,USERNAME
 
 # Source the variables
 source secret.env
@@ -48,9 +83,9 @@ The binary name for yaml2env is `yaml2env`.
 Archives of precompiled binaries for yaml2env are available for macOS and Linux.
 Users are advised to download one of these archives.
 
-### Downloading release
+### Downloading released binaries
 
-See: https://github.com/vikin91/yaml2env/releases
+[See releases](releases)
 
 ## Building
 
