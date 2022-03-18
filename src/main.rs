@@ -3,7 +3,7 @@
 extern crate log;
 
 extern crate yaml_rust;
-use clap::{App, Arg};
+use clap::{Arg, Command};
 use std::ffi::OsStr;
 use std::fs;
 use std::fs::File;
@@ -15,7 +15,7 @@ use yaml2env::Result;
 
 fn main() -> Result<()> {
     env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("debug")).init();
-    let flags = App::new("yaml2env")
+    let flags = Command::new("yaml2env")
         .version("0.1.0")
         .author("vikin91 <vikin91@users.noreply.github.com>")
         .about(
@@ -27,7 +27,7 @@ fn main() -> Result<()> {
                 .long("in")
                 .takes_value(true)
                 .required(true)
-                .about("Path of the input yaml file"),
+                .help("Path of the input yaml file"),
         )
         .arg(
             Arg::new("out-file")
@@ -35,14 +35,14 @@ fn main() -> Result<()> {
                 .long("out")
                 .takes_value(true)
                 .default_value_os(OsStr::new("out.env"))
-                .about("Path of the output env file"),
+                .help("Path of the output env file"),
         )
         .arg(
             Arg::new("filter")
                 .short('f')
                 .long("filter")
-                .use_delimiter(true)
-                .about("Comma-separated list of yaml keys to export"),
+                .use_value_delimiter(true)
+                .help("Comma-separated list of yaml keys to export"),
         )
         .get_matches();
 
