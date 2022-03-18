@@ -27,6 +27,7 @@ fn main() -> Result<()> {
                 .long("in")
                 .takes_value(true)
                 .required(true)
+                .allow_invalid_utf8(true)
                 .help("Path of the input yaml file"),
         )
         .arg(
@@ -34,6 +35,7 @@ fn main() -> Result<()> {
                 .short('o')
                 .long("out")
                 .takes_value(true)
+                .allow_invalid_utf8(true)
                 .default_value_os(OsStr::new("out.env"))
                 .help("Path of the output env file"),
         )
