@@ -16,7 +16,7 @@ use yaml2env::Result;
 fn main() -> Result<()> {
     env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("debug")).init();
     let flags = Command::new("yaml2env")
-        .version("0.1.0")
+        .version("0.1.1")
         .author("vikin91 <vikin91@users.noreply.github.com>")
         .about(
             "Converts first level variables from a yaml file into set of exportable shell variables",

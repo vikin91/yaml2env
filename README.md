@@ -89,7 +89,7 @@ Users are advised to download one of these archives.
 - [All releases](https://github.com/vikin91/yaml2env/releases)
 
 ```sh
-VERSION="v0.1.0"
+VERSION="v0.1.1"
 ARCH="x86_64-apple-darwin"
 
 # Download
@@ -112,7 +112,7 @@ $ git clone https://github.com/vikin91/yaml2env
 $ cd yaml2env
 $ cargo build --release
 $ ./target/release/yaml2env --version
-yaml2env 0.1.0
+yaml2env 0.1.1
 ```
 
 ## Running tests
