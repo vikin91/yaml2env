@@ -67,7 +67,7 @@ jobs:
           #   target: aarch64-apple-darwin
     steps:
       - name: Download version artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: version
       - name: Parse version
