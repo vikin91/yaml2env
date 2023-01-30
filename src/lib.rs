@@ -34,11 +34,7 @@ pub fn convert(yaml_str: String, filter: &[String]) -> Result<String> {
                 if let Some(value) = v.into_string() {
                     debug!("Written key '{}'", key);
                     // Using `{value:?}` would surround the contents with double-quotes
-                    buf.write_fmt(format_args!(
-                        "{name}=$(cat << '_EOF'\n{value}\n_EOF\n)\n\n",
-                        name = key,
-                        value = value
-                    ))?;
+                    buf.write_fmt(format_args!("{key}=$(cat << '_EOF'\n{value}\n_EOF\n)\n\n"))?;
                 }
             } else {
                 debug!("Skipping key '{}'", key);
